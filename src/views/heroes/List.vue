@@ -1,7 +1,8 @@
 <template>
     <div>
         <h2 class="sub-header">英雄列表</h2>
-        <a class="btn btn-success" href="add.html">Add</a>
+        <!-- <a class="btn btn-success" href="add">Add</a> -->
+        <router-link class='btn btn-success' to="/heroes/add">Add</router-link>
         <div class="table-responsive">
           <table class="table table-striped">
             <thead>
@@ -22,10 +23,12 @@
                 <td>
                   <a href="edit.html">edit</a>
                   &nbsp;&nbsp;
-                  <a href="javascript:window.confirm('Are you sure?')">delete</a>
+                  <a href="javascript:;" @click.prevent="handleDelete(item.id)">delete</a>
                 </td>
               </tr>
-              
+              <tr>
+                <td v-if="list.length == 0" colspan="4">暂无数据</td>
+              </tr>
             </tbody>
           </table>
     </div>
@@ -69,7 +72,7 @@ export default{
       list:[]
     }
   },
-  mounted(){
+  mounted(){ 
       this.ListData();
   },
   methods:{
@@ -79,6 +82,27 @@ export default{
           .then((Response)=>{
             if(Response.status === 200){
               this.list = Response.data;
+            }
+          })
+          .catch((err)=>{
+            console.log(err);
+            
+          })
+    },
+    handleDelete(id){
+      //删除提示
+      if(!confirm('您确定删除吗')){
+        return;
+      }
+      // id为何要用模板字符串
+      axios
+          .delete(`http://localhost:3001/heroes/${id}`)
+          .then((response)=>{
+            if(response.status === 200){
+              alert('删除成功');
+              this.ListData();
+            } else {
+              alert('删除失败')
             }
           })
           .catch((err)=>{
